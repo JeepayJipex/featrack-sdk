@@ -8,18 +8,18 @@ export interface UsagesOptions extends FTOptions {
   errorMode: 'warn' | 'throw'
 }
 export class Usages {
-  private baseUrl = 'https://featrack.io/api/'
-  private axiosInstance: AxiosInstance | null = null
+  protected baseUrl = 'https://featrack.io/api/'
+  protected axiosInstance: AxiosInstance | null = null
 
-  private endpoints = {
+  protected endpoints = {
     track: 'usages/consume',
   }
 
-  private token: string = ''
-  private appSlug: string = ''
-  private options: UsagesOptions = { errorMode: 'warn' }
+  protected token: string = ''
+  protected appSlug: string = ''
+  protected options: UsagesOptions = { errorMode: 'warn' }
 
-  private userUniqueId: string | null = null
+  protected userUniqueId: string | null = null
 
   constructor() {
   }
@@ -58,6 +58,11 @@ export class Usages {
       return
     }
 
+    if (!this.axiosInstance) {
+      warnOrThrow(new FeatrackError('Featrack SDK not initialized'), this.options.errorMode)
+      return
+    }
+
     const { date, customerName, featureEmoji, featureName, featureDescription } = params || {}
 
     const body = {
@@ -74,8 +79,8 @@ export class Usages {
     try {
       await this.axiosInstance?.post(this.endpoints.track, stripUndefinedValues(body))
     }
-    catch (err) {
-      console.error(err)
+    catch (err: any) {
+      warnOrThrow(err, this.options.errorMode)
     }
   }
 
@@ -83,7 +88,7 @@ export class Usages {
     this.userUniqueId = userUniqueId
   }
 
-  private createAxiosInstance() {
+  protected createAxiosInstance() {
     this.axiosInstance = axios.create({
       baseURL: this.baseUrl,
       headers: {

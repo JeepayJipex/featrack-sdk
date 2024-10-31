@@ -9,18 +9,18 @@ interface CustomersOptions extends FTOptions {
 }
 
 export class Customers {
-  private baseUrl = 'https://featrack.io/api/'
-  private axiosInstance: AxiosInstance | null = null
+  protected baseUrl = 'https://featrack.io/api/'
+  protected axiosInstance: AxiosInstance | null = null
 
-  private endpoints = {
+  protected endpoints = {
     create: 'customers/create',
   }
 
-  private token: string = ''
+  protected token: string = ''
 
-  private applicationSlug = ''
+  protected applicationSlug = ''
 
-  private options: CustomersOptions = { errorMode: 'warn' }
+  protected options: CustomersOptions = { errorMode: 'warn' }
 
   constructor() {
   }
@@ -60,13 +60,17 @@ export class Customers {
       return
     }
 
-    const response = await this.axiosInstance.post<CustomersTypes['create']['output'], AxiosResponse<CustomersTypes['create']['output']>, CustomersTypes['create']['input']>(this.endpoints.create, {
-      applicationSlug: this.applicationSlug,
-      uniqueId,
-      ...params,
-    })
-
-    return response.data
+    try {
+      const response = await this.axiosInstance?.post<CustomersTypes['create']['output'], AxiosResponse<CustomersTypes['create']['output']>, CustomersTypes['create']['input']>(this.endpoints.create, {
+        applicationSlug: this.applicationSlug,
+        uniqueId,
+        ...params,
+      })
+  
+      return response.data
+    } catch (error: any) {
+      warnOrThrow(error, this.options.errorMode)
+    }
   }
 
   private createAxiosInstance() {
@@ -77,5 +81,13 @@ export class Customers {
         'authorization': `Bearer ${this.token}`,
       },
     })
+
+    this.axiosInstance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        warnOrThrow
+        return Promise.reject(error)
+      }
+    )
   }
 }
