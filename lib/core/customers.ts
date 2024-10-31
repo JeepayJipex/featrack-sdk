@@ -1,8 +1,7 @@
 import type { AxiosInstance, AxiosResponse } from 'axios'
 import type { CustomersTypes, FTOptions } from './types'
-import axios from 'axios'
 import { FeatrackError } from './featrack.errors'
-import { warnOrThrow } from './helpers'
+import { buildAxiosInstance, warnOrThrow } from './helpers'
 
 interface CustomersOptions extends FTOptions {
   errorMode: 'warn' | 'throw'
@@ -28,7 +27,7 @@ export class Customers {
   init(
     token: string,
     appSlug: string,
-    options: CustomersOptions = { errorMode: 'warn' }
+    options: CustomersOptions = { errorMode: 'warn' },
   ) {
     this.token = token
     this.applicationSlug = appSlug
@@ -36,14 +35,14 @@ export class Customers {
     if (options.ftApiUrl) {
       this.baseUrl = options.ftApiUrl.endsWith('/') ? options.ftApiUrl : `${options.ftApiUrl}/`
     }
-    this.createAxiosInstance()
+    this.axiosInstance = buildAxiosInstance(this.token, this.baseUrl, this.options.errorMode)
   }
 
   async create(
     uniqueId: string,
     params?: {
       customerName?: string
-    }
+    },
   ) {
     if (!uniqueId) {
       warnOrThrow(new FeatrackError('customer name is required'), this.options.errorMode)
@@ -66,28 +65,11 @@ export class Customers {
         uniqueId,
         ...params,
       })
-  
+
       return response.data
-    } catch (error: any) {
+    }
+    catch (error: any) {
       warnOrThrow(error, this.options.errorMode)
     }
-  }
-
-  private createAxiosInstance() {
-    this.axiosInstance = axios.create({
-      baseURL: this.baseUrl,
-      headers: {
-        'Content-Type': 'application/json',
-        'authorization': `Bearer ${this.token}`,
-      },
-    })
-
-    this.axiosInstance.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        warnOrThrow
-        return Promise.reject(error)
-      }
-    )
   }
 }

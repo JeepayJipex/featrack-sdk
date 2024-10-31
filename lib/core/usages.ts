@@ -1,8 +1,7 @@
 import type { AxiosInstance } from 'axios'
 import type { FTOptions } from './types'
-import axios from 'axios'
 import { FeatrackError } from './featrack.errors'
-import { stripUndefinedValues, warnOrThrow } from './helpers'
+import { buildAxiosInstance, stripUndefinedValues, warnOrThrow } from './helpers'
 
 export interface UsagesOptions extends FTOptions {
   errorMode: 'warn' | 'throw'
@@ -27,7 +26,7 @@ export class Usages {
   init(
     token: string,
     appSlug: string,
-    options: UsagesOptions = { errorMode: 'warn' }
+    options: UsagesOptions = { errorMode: 'warn' },
   ) {
     this.token = token
     this.appSlug = appSlug
@@ -35,7 +34,7 @@ export class Usages {
     if (options.ftApiUrl) {
       this.baseUrl = options.ftApiUrl.endsWith('/') ? options.ftApiUrl : `${options.ftApiUrl}/`
     }
-    this.createAxiosInstance()
+    this.axiosInstance = buildAxiosInstance(this.token, this.baseUrl, this.options.errorMode)
   }
 
   async track(
@@ -46,7 +45,7 @@ export class Usages {
       featureEmoji?: string
       featureName?: string
       featureDescription?: string
-    }
+    },
   ) {
     if (!this.userUniqueId) {
       warnOrThrow(new FeatrackError('user is not identified, cannot send usages'), this.options.errorMode)
@@ -73,7 +72,7 @@ export class Usages {
       customerName,
       featureEmoji,
       featureName,
-      featureDescription
+      featureDescription,
     }
 
     try {
@@ -86,14 +85,5 @@ export class Usages {
 
   identify(userUniqueId: string) {
     this.userUniqueId = userUniqueId
-  }
-
-  protected createAxiosInstance() {
-    this.axiosInstance = axios.create({
-      baseURL: this.baseUrl,
-      headers: {
-        authorization: `Bearer ${this.token}`
-      },
-    })
   }
 }
