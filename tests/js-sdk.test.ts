@@ -1,9 +1,8 @@
-import {describe, expect, it} from 'vitest'
-import { FT } from '../lib/index'
+import { describe, expect, it } from 'vitest'
 import { FeatrackError } from '../lib/core/featrack.errors'
+import { FT } from '../lib/index'
 
-
-describe('FT SDK', () => {
+describe('fT SDK', () => {
   it('should initialize usages and customers with valid token and appSlug', () => {
     const sdk = FT('validToken', 'validAppSlug')
     expect(sdk.usages).toBeDefined()
