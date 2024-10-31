@@ -77,4 +77,4 @@ We welcome contributions! Please see our [contributing guidelines](https://examp
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
-If you have any questions or need support, please contact me at jean.mariette@biwyze.fr.
+If you have any questions or need support, please contact me at contact@featrack.io .
