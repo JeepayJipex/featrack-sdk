@@ -1,0 +1,38 @@
+{
+  "name": "featrack-sdk",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "dist",
+    "package.json"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    },
+    "./js": {
+      "types": "./dist/js.d.ts",
+      "require": "./dist/js.cjs",
+      "import": "./dist/js.js"
+    },
+    "./*": "./*"
+  },
+  "scripts": {
+    "start:dev": "vite",
+    "dev": "tsup --tsconfig tsconfig.build.json --watch",
+    "build": "tsup --tsconfig tsconfig.build.json",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "~5.6.2",
+    "vite": "^5.4.9"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "tsup": "^8.3.5",
+    "vite-plugin-dts": "^4.3.0"
+  }
+}
