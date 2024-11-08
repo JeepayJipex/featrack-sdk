@@ -2,6 +2,7 @@ import type { FTOptions } from '../core/types'
 import { Customers } from '../core/customers'
 import { FeatrackError } from '../core/featrack.errors'
 import { warnOrThrow } from '../core/helpers'
+import { Sessions } from '../core/sessions'
 import { Usages } from '../core/usages'
 
 export function FT(token: string, appSlug: string, {
@@ -26,6 +27,7 @@ export function FT(token: string, appSlug: string, {
 
   const usages = new Usages()
   const customers = new Customers()
+  const sessions = new Sessions()
 
   usages.init(token, appSlug, {
     ftApiUrl,
@@ -33,6 +35,11 @@ export function FT(token: string, appSlug: string, {
   })
 
   customers.init(token, appSlug, {
+    ftApiUrl,
+    errorMode,
+  })
+
+  sessions.init(token, appSlug, {
     ftApiUrl,
     errorMode,
   })
@@ -51,6 +58,7 @@ export function FT(token: string, appSlug: string, {
     customers: {
       create: createCustomer,
       identify,
-    }
+    },
+    sessions,
   }
 }

@@ -36,7 +36,6 @@ const ft = FT('YOUR_API_KEY', 'YOUR_APPLICATION_SLUG', {
     ftApiUrl: 'https://api.featrack.io/api/', // Optional
 });
 
-
 // Create a customer
 ft.customers.create('customer_unique_id', {
     customerName: 'John Doe', // Optional
@@ -61,10 +60,10 @@ You can configure the SDK with various options to suit your needs:
 
 ```javascript
 const featrack = new Featrack({
-    apiKey: 'YOUR_API_KEY',
-    environment: 'production',
-    debug: true
-});
+  apiKey: 'YOUR_API_KEY',
+  environment: 'production',
+  debug: true
+})
 ```
 
 <!-- ## Documentation

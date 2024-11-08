@@ -4,6 +4,15 @@ import { BaseApi } from './api'
 import { FeatrackError } from './featrack.errors'
 import { warnOrThrow } from './helpers'
 
+interface IdentifyInput {
+  sessionId: string
+  applicationSlug: string
+  customerUniqueId: string
+}
+
+interface IdentifyOutput {
+  success: boolean
+}
 interface StartInput {
   applicationSlug: string
   customerUniqueId?: string
@@ -40,9 +49,19 @@ export class Sessions extends BaseApi<SessionsOptions> {
     start: 'sessions/start',
     setTimeSpent: 'sessions/set-time',
     end: 'sessions/end',
+    identify: 'sessions/identify',
   }
 
+  protected userUniqueId: string | null = null
+
+  protected currentSessionId: string | null = null
+
   async start(params: Omit<StartInput, 'applicationSlug'>): Promise<StartOutput | void> {
+    if (this.currentSessionId) {
+      warnOrThrow(new FeatrackError('session already started'), this.options.errorMode)
+      return
+    }
+
     if (!this.applicationSlug) {
       warnOrThrow(new FeatrackError('application slug is required'), this.options.errorMode)
       return
@@ -61,7 +80,7 @@ export class Sessions extends BaseApi<SessionsOptions> {
           applicationSlug: this.applicationSlug,
         },
       )
-
+      this.currentSessionId = response.data.sessionId
       return response.data
     }
     catch (error: any) {
@@ -69,9 +88,9 @@ export class Sessions extends BaseApi<SessionsOptions> {
     }
   }
 
-  async setTimeSpent(params: SetTimeSpentInput): Promise<SetTimeSpentOutput | void> {
-    if (!params.sessionId) {
-      warnOrThrow(new FeatrackError('session ID is required'), this.options.errorMode)
+  async setTimeSpent(params: Omit<SetTimeSpentInput, 'sessionId'>): Promise<SetTimeSpentOutput | void> {
+    if (!this.currentSessionId) {
+      warnOrThrow(new FeatrackError('Session is not started'), this.options.errorMode)
       return
     }
 
@@ -83,7 +102,10 @@ export class Sessions extends BaseApi<SessionsOptions> {
     try {
       const response = await this.axiosInstance?.post<SetTimeSpentOutput, AxiosResponse<SetTimeSpentOutput>, SetTimeSpentInput>(
         this.endpoints.setTimeSpent,
-        params,
+        {
+          ...params,
+          sessionId: this.currentSessionId,
+        },
       )
 
       return response.data
@@ -93,9 +115,9 @@ export class Sessions extends BaseApi<SessionsOptions> {
     }
   }
 
-  async end(params: EndInput): Promise<EndOutput | void> {
-    if (!params.sessionId) {
-      warnOrThrow(new FeatrackError('session ID is required'), this.options.errorMode)
+  async end(params: Omit<EndInput, 'sessionId'>): Promise<EndOutput | void> {
+    if (!this.currentSessionId) {
+      warnOrThrow(new FeatrackError('Session is not started'), this.options.errorMode)
       return
     }
 
@@ -107,7 +129,45 @@ export class Sessions extends BaseApi<SessionsOptions> {
     try {
       const response = await this.axiosInstance?.post<EndOutput, AxiosResponse<EndOutput>, EndInput>(
         this.endpoints.end,
-        params,
+        { ...params, sessionId: this.currentSessionId },
+      )
+
+      return response.data
+    }
+    catch (error: any) {
+      warnOrThrow(error, this.options.errorMode)
+    }
+  }
+
+  async identify(params: Omit<IdentifyInput, 'sessionId'>): Promise<IdentifyOutput | void> {
+    if (!params.customerUniqueId) {
+      warnOrThrow(new FeatrackError('customer unique ID is required'), this.options.errorMode)
+      return
+    }
+
+    if (!this.currentSessionId) {
+      await this.start({ customerUniqueId: params.customerUniqueId })
+    }
+
+    if (!this.currentSessionId) {
+      warnOrThrow(new FeatrackError('Session is not started'), this.options.errorMode)
+      return
+    }
+
+    if (!this.axiosInstance) {
+      warnOrThrow(new FeatrackError('Featrack SDK not initialized'), this.options.errorMode)
+      return
+    }
+
+    this.userUniqueId = params.customerUniqueId
+    try {
+      const response = await this.axiosInstance?.post<IdentifyOutput, AxiosResponse<IdentifyOutput>, IdentifyInput>(
+        this.endpoints.identify,
+        {
+          ...params,
+          sessionId: this.currentSessionId,
+          customerUniqueId: this.userUniqueId,
+        },
       )
 
       return response.data

@@ -61,45 +61,76 @@ describe('sessions', () => {
     expect(warnOrThrowSpy).toHaveBeenCalledWith(new FeatrackError(errorMessage), 'warn')
   })
 
-  it('should throw error if sessionId is not provided on setTimeSpent', async () => {
+  it('should throw error if session is not started on setTimeSpent', async () => {
     const warnOrThrowSpy = vi.spyOn(helpers, 'warnOrThrow')
-    await sessions.setTimeSpent({ sessionId: '', timeSpentMs })
-    expect(warnOrThrowSpy).toHaveBeenCalledWith(new FeatrackError('session ID is required'), 'warn')
+    await sessions.setTimeSpent({ timeSpentMs })
+    expect(warnOrThrowSpy).toHaveBeenCalledWith(new FeatrackError('Session is not started'), 'warn')
   })
 
   it('should make a POST request to set time spent', async () => {
+    sessions['currentSessionId'] = sessionId
     const postMock = vi.spyOn(sessions['axiosInstance']!, 'post').mockResolvedValue({ data: { success: true } })
-    const response = await sessions.setTimeSpent({ sessionId, timeSpentMs })
+    const response = await sessions.setTimeSpent({ timeSpentMs })
     expect(postMock).toHaveBeenCalledWith('sessions/set-time', { sessionId, timeSpentMs })
     expect(response).toEqual({ success: true })
   })
 
   it('should handle axios response error correctly on setTimeSpent', async () => {
+    sessions['currentSessionId'] = sessionId
     const warnOrThrowSpy = vi.spyOn(helpers, 'warnOrThrow')
     const errorMessage = 'Request failed'
     vi.spyOn(sessions['axiosInstance']!, 'post').mockRejectedValue(new AxiosError(errorMessage))
-    await sessions.setTimeSpent({ sessionId, timeSpentMs })
+    await sessions.setTimeSpent({ timeSpentMs })
     expect(warnOrThrowSpy).toHaveBeenCalledWith(new FeatrackError(errorMessage), 'warn')
   })
 
-  it('should throw error if sessionId is not provided on end', async () => {
+  it('should throw error if session is not started on end', async () => {
     const warnOrThrowSpy = vi.spyOn(helpers, 'warnOrThrow')
-    await sessions.end({ sessionId: '', timeSpentMs })
-    expect(warnOrThrowSpy).toHaveBeenCalledWith(new FeatrackError('session ID is required'), 'warn')
+    await sessions.end({ timeSpentMs })
+    expect(warnOrThrowSpy).toHaveBeenCalledWith(new FeatrackError('Session is not started'), 'warn')
   })
 
   it('should make a POST request to end session', async () => {
+    sessions['currentSessionId'] = sessionId
     const postMock = vi.spyOn(sessions['axiosInstance']!, 'post').mockResolvedValue({ data: { success: true } })
-    const response = await sessions.end({ sessionId, timeSpentMs })
+    const response = await sessions.end({ timeSpentMs })
     expect(postMock).toHaveBeenCalledWith('sessions/end', { sessionId, timeSpentMs })
     expect(response).toEqual({ success: true })
   })
 
   it('should handle axios response error correctly on end', async () => {
+    sessions['currentSessionId'] = sessionId
     const warnOrThrowSpy = vi.spyOn(helpers, 'warnOrThrow')
     const errorMessage = 'Request failed'
     vi.spyOn(sessions['axiosInstance']!, 'post').mockRejectedValue(new AxiosError(errorMessage))
-    await sessions.end({ sessionId, timeSpentMs })
+    await sessions.end({ timeSpentMs })
+    expect(warnOrThrowSpy).toHaveBeenCalledWith(new FeatrackError(errorMessage), 'warn')
+  })
+
+  it('should throw error if customerUniqueId is not provided on identify', async () => {
+    const warnOrThrowSpy = vi.spyOn(helpers, 'warnOrThrow')
+    await sessions.identify({ applicationSlug: appSlug, customerUniqueId: '' })
+    expect(warnOrThrowSpy).toHaveBeenCalledWith(new FeatrackError('customer unique ID is required'), 'warn')
+  })
+
+  it('should make a POST request to identify session', async () => {
+    sessions['currentSessionId'] = sessionId
+    const postMock = vi.spyOn(sessions['axiosInstance']!, 'post').mockResolvedValue({ data: { success: true } })
+    const response = await sessions.identify({ applicationSlug: appSlug, customerUniqueId: 'customer-123' })
+    expect(postMock).toHaveBeenCalledWith('sessions/identify', {
+      applicationSlug: appSlug,
+      customerUniqueId: 'customer-123',
+      sessionId,
+    })
+    expect(response).toEqual({ success: true })
+  })
+
+  it('should handle axios response error correctly on identify', async () => {
+    sessions['currentSessionId'] = sessionId
+    const warnOrThrowSpy = vi.spyOn(helpers, 'warnOrThrow')
+    const errorMessage = 'Request failed'
+    vi.spyOn(sessions['axiosInstance']!, 'post').mockRejectedValue(new AxiosError(errorMessage))
+    await sessions.identify({ applicationSlug: appSlug, customerUniqueId: 'customer-123' })
     expect(warnOrThrowSpy).toHaveBeenCalledWith(new FeatrackError(errorMessage), 'warn')
   })
 })
