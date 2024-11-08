@@ -53,6 +53,26 @@ featrack.track('feature_slug', {
     createdAt: '2022-01-01T00:00:00Z', // Optional (default: current date/time)
 });
 
+// Start a session
+ft.sessions.start({
+    customerUniqueId: 'customer_unique_id'
+}).then(session => {
+    console.log('Session started:', session.sessionId);
+});
+
+// Set time spent in a session
+ft.sessions.setTimeSpent({
+    timeSpentMs: 5000 // Time spent in milliseconds
+}).then(response => {
+    console.log('Time spent set:', response.success);
+});
+
+// End a session
+ft.sessions.end({
+    timeSpentMs: 10000 // Total time spent in milliseconds
+}).then(response => {
+    console.log('Session ended:', response.success);
+});
 ```
 
 ## Configuration
