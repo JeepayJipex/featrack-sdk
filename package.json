@@ -5,10 +5,10 @@
   "private": false,
   "author": "JeepayJipex",
   "license": "MIT",
-
+  "homepage": "https://featrack.io",
   "repository": {
     "type": "git",
-    "url": "https//github.com/JeepayJipex/featrack-sdk.git"
+    "url": "git+https//github.com/JeepayJipex/featrack-sdk.git"
   },
   "exports": {
     ".": {
