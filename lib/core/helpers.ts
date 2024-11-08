@@ -1,6 +1,7 @@
+import type { FTOptions } from './types'
 import axios from 'axios'
 
-export function warnOrThrow(error: Error, errorMode: 'warn' | 'throw') {
+export function warnOrThrow(error: Error, errorMode: FTOptions['errorMode']) {
   if (errorMode === 'throw') {
     throw error
   }
@@ -20,7 +21,7 @@ export function stripUndefinedValues(obj: Record<string, any>) {
   )
 }
 
-export function buildAxiosInstance(token: string, baseURL: string, errorMode: 'warn' | 'throw') {
+export function buildAxiosInstance(token: string, baseURL: string, errorMode: FTOptions['errorMode']) {
   const axiosInstance = axios.create({
     baseURL,
     headers: {

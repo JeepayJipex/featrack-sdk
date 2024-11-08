@@ -1,41 +1,17 @@
-import type { AxiosInstance } from 'axios'
 import type { FTOptions } from './types'
+import { BaseApi } from './api'
 import { FeatrackError } from './featrack.errors'
-import { buildAxiosInstance, stripUndefinedValues, warnOrThrow } from './helpers'
+import { stripUndefinedValues, warnOrThrow } from './helpers'
 
 export interface UsagesOptions extends FTOptions {
   errorMode: 'warn' | 'throw'
 }
-export class Usages {
-  protected baseUrl = 'https://featrack.io/api/'
-  protected axiosInstance: AxiosInstance | null = null
-
+export class Usages extends BaseApi<UsagesOptions> {
   protected endpoints = {
     track: 'usages/consume',
   }
 
-  protected token: string = ''
-  protected appSlug: string = ''
-  protected options: UsagesOptions = { errorMode: 'warn' }
-
   protected userUniqueId: string | null = null
-
-  constructor() {
-  }
-
-  init(
-    token: string,
-    appSlug: string,
-    options: UsagesOptions = { errorMode: 'warn' },
-  ) {
-    this.token = token
-    this.appSlug = appSlug
-    this.options = { ...this.options, ...options }
-    if (options.ftApiUrl) {
-      this.baseUrl = options.ftApiUrl.endsWith('/') ? options.ftApiUrl : `${options.ftApiUrl}/`
-    }
-    this.axiosInstance = buildAxiosInstance(this.token, this.baseUrl, this.options.errorMode)
-  }
 
   async track(
     slug: string,
@@ -67,7 +43,7 @@ export class Usages {
     const body = {
       customerUniqueId: this.userUniqueId,
       featureSlug: slug,
-      applicationSlug: this.appSlug,
+      applicationSlug: this.applicationSlug,
       createdAt: date || new Date().toISOString(),
       customerName,
       featureEmoji,

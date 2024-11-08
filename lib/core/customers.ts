@@ -1,41 +1,16 @@
-import type { AxiosInstance, AxiosResponse } from 'axios'
+import type { AxiosResponse } from 'axios'
 import type { CustomersTypes, FTOptions } from './types'
+import { BaseApi } from './api'
 import { FeatrackError } from './featrack.errors'
-import { buildAxiosInstance, warnOrThrow } from './helpers'
+import { warnOrThrow } from './helpers'
 
 interface CustomersOptions extends FTOptions {
   errorMode: 'warn' | 'throw'
 }
 
-export class Customers {
-  protected baseUrl = 'https://featrack.io/api/'
-  protected axiosInstance: AxiosInstance | null = null
-
+export class Customers extends BaseApi<CustomersOptions> {
   protected endpoints = {
     create: 'customers/create',
-  }
-
-  protected token: string = ''
-
-  protected applicationSlug = ''
-
-  protected options: CustomersOptions = { errorMode: 'warn' }
-
-  constructor() {
-  }
-
-  init(
-    token: string,
-    appSlug: string,
-    options: CustomersOptions = { errorMode: 'warn' },
-  ) {
-    this.token = token
-    this.applicationSlug = appSlug
-    this.options = { ...this.options, ...options }
-    if (options.ftApiUrl) {
-      this.baseUrl = options.ftApiUrl.endsWith('/') ? options.ftApiUrl : `${options.ftApiUrl}/`
-    }
-    this.axiosInstance = buildAxiosInstance(this.token, this.baseUrl, this.options.errorMode)
   }
 
   async create(

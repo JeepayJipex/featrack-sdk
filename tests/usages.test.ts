@@ -21,7 +21,7 @@ describe('usages', () => {
     expect(usages['baseUrl']).toBe('https://featrack.io/api/')
     expect(usages['axiosInstance']).toBeNull()
     expect(usages['token']).toBe('')
-    expect(usages['appSlug']).toBe('')
+    expect(usages['applicationSlug']).toBe('')
     expect(usages['options']).toEqual({ errorMode: 'warn' })
     expect(usages['userUniqueId']).toBeNull()
   })
@@ -29,7 +29,7 @@ describe('usages', () => {
   it('should initialize with provided values', () => {
     usages.init('test-token', 'test-app', { errorMode: 'throw', ftApiUrl: 'https://custom.api/' })
     expect(usages['token']).toBe('test-token')
-    expect(usages['appSlug']).toBe('test-app')
+    expect(usages['applicationSlug']).toBe('test-app')
     expect(usages['options']).toEqual({ errorMode: 'throw', ftApiUrl: 'https://custom.api/' })
     expect(usages['baseUrl']).toBe('https://custom.api/')
   })
