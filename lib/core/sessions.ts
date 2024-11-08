@@ -56,6 +56,10 @@ export class Sessions extends BaseApi<SessionsOptions> {
 
   protected currentSessionId: string | null = null
 
+  getSessionId() {
+    return this.currentSessionId
+  }
+
   async start(params: Omit<StartInput, 'applicationSlug'>): Promise<StartOutput | void> {
     if (this.currentSessionId) {
       warnOrThrow(new FeatrackError('session already started'), this.options.errorMode)

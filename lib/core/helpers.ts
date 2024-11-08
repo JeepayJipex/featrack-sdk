@@ -33,7 +33,7 @@ export function buildAxiosInstance(token: string, baseURL: string, errorMode: FT
   axiosInstance.interceptors.response.use(
     response => response,
     (error) => {
-      warnOrThrow(new Error(error.response.data.message), errorMode)
+      warnOrThrow(new Error(error?.message || error.response?.data?.message), errorMode)
       return Promise.reject(error)
     },
   )

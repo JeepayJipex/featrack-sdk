@@ -44,13 +44,17 @@ export function FT(token: string, appSlug: string, {
     errorMode,
   })
 
-  function identify(uniqueId: string) {
+  async function identify(uniqueId: string) {
     usages.identify(uniqueId)
-    sessions.identify({customerUniqueId: uniqueId})
+    await sessions.identify({ customerUniqueId: uniqueId })
+    const sessionId = sessions.getSessionId()
+    if (sessionId) {
+      usages.setSessionId(sessionId)
+    }
   }
 
-  function createCustomer(uniqueId: string, params?: { customerName?: string }) {
-    customers.create(uniqueId, params)
+  async function createCustomer(uniqueId: string, params?: { customerName?: string }) {
+    await customers.create(uniqueId, params)
     usages.identify(uniqueId)
   }
 

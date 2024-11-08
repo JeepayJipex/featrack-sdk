@@ -12,6 +12,7 @@ export class Usages extends BaseApi<UsagesOptions> {
   }
 
   protected userUniqueId: string | null = null
+  protected sessionId: string | null = null
 
   async track(
     slug: string,
@@ -49,6 +50,7 @@ export class Usages extends BaseApi<UsagesOptions> {
       featureEmoji,
       featureName,
       featureDescription,
+      ...(this.sessionId ? { sessionId: this.sessionId } : {}),
     }
 
     try {
@@ -61,5 +63,9 @@ export class Usages extends BaseApi<UsagesOptions> {
 
   identify(userUniqueId: string) {
     this.userUniqueId = userUniqueId
+  }
+
+  setSessionId(sessionId: string) {
+    this.sessionId = sessionId
   }
 }

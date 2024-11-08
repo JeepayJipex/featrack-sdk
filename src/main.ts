@@ -1,6 +1,6 @@
+import { FT } from '../lib/js/sdk-js.ts'
 import { setupCounter } from './counter.ts'
 import { setupCustomerForm } from './customer.ts'
-import { FT } from '../lib/js/sdk-js.ts'
 import typescriptLogo from './typescript.svg'
 import './style.css'
 import viteLogo from '/vite.svg'
@@ -21,6 +21,14 @@ if (!window.FT) {
 }
 
 window.FT.customers.identify('123456')
+const startDate = new Date()
+
+window.addEventListener('beforeunload', async () => {
+  const endDate = new Date()
+  await window.FT.sessions.end({
+    timeSpentMs: endDate.getTime() - startDate.getTime(),
+  })
+})
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
