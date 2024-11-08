@@ -46,6 +46,7 @@ export function FT(token: string, appSlug: string, {
 
   function identify(uniqueId: string) {
     usages.identify(uniqueId)
+    sessions.identify({customerUniqueId: uniqueId})
   }
 
   function createCustomer(uniqueId: string, params?: { customerName?: string }) {

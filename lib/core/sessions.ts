@@ -139,7 +139,7 @@ export class Sessions extends BaseApi<SessionsOptions> {
     }
   }
 
-  async identify(params: Omit<IdentifyInput, 'sessionId'>): Promise<IdentifyOutput | void> {
+  async identify(params: Omit<IdentifyInput, 'sessionId' | 'applicationSlug'>): Promise<IdentifyOutput | void> {
     if (!params.customerUniqueId) {
       warnOrThrow(new FeatrackError('customer unique ID is required'), this.options.errorMode)
       return
@@ -167,6 +167,7 @@ export class Sessions extends BaseApi<SessionsOptions> {
           ...params,
           sessionId: this.currentSessionId,
           customerUniqueId: this.userUniqueId,
+          applicationSlug: this.applicationSlug,
         },
       )
 

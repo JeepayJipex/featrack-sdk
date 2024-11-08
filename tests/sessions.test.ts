@@ -106,21 +106,26 @@ describe('sessions', () => {
     await sessions.end({ timeSpentMs })
     expect(warnOrThrowSpy).toHaveBeenCalledWith(new FeatrackError(errorMessage), 'warn')
   })
-
   it('should throw error if customerUniqueId is not provided on identify', async () => {
     const warnOrThrowSpy = vi.spyOn(helpers, 'warnOrThrow')
-    await sessions.identify({ applicationSlug: appSlug, customerUniqueId: '' })
+    await sessions.identify({ customerUniqueId: '' })
     expect(warnOrThrowSpy).toHaveBeenCalledWith(new FeatrackError('customer unique ID is required'), 'warn')
+  })
+
+  it('should start a session if not already started on identify', async () => {
+    const startSpy = vi.spyOn(sessions, 'start').mockResolvedValue({ sessionId })
+    await sessions.identify({ customerUniqueId: 'customer-123' })
+    expect(startSpy).toHaveBeenCalledWith({ customerUniqueId: 'customer-123' })
   })
 
   it('should make a POST request to identify session', async () => {
     sessions['currentSessionId'] = sessionId
     const postMock = vi.spyOn(sessions['axiosInstance']!, 'post').mockResolvedValue({ data: { success: true } })
-    const response = await sessions.identify({ applicationSlug: appSlug, customerUniqueId: 'customer-123' })
+    const response = await sessions.identify({ customerUniqueId: 'customer-123' })
     expect(postMock).toHaveBeenCalledWith('sessions/identify', {
-      applicationSlug: appSlug,
       customerUniqueId: 'customer-123',
       sessionId,
+      applicationSlug: appSlug,
     })
     expect(response).toEqual({ success: true })
   })
@@ -130,7 +135,7 @@ describe('sessions', () => {
     const warnOrThrowSpy = vi.spyOn(helpers, 'warnOrThrow')
     const errorMessage = 'Request failed'
     vi.spyOn(sessions['axiosInstance']!, 'post').mockRejectedValue(new AxiosError(errorMessage))
-    await sessions.identify({ applicationSlug: appSlug, customerUniqueId: 'customer-123' })
+    await sessions.identify({ customerUniqueId: 'customer-123' })
     expect(warnOrThrowSpy).toHaveBeenCalledWith(new FeatrackError(errorMessage), 'warn')
   })
 })
