@@ -16,6 +16,8 @@ interface IdentifyOutput {
 interface StartInput {
   applicationSlug: string
   customerUniqueId?: string
+  screen?: 'mobile' | 'desktop' | 'tablet' | 'other'
+  timezone?: string
 }
 
 interface StartOutput {
