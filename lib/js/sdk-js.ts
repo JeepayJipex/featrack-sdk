@@ -1,9 +1,7 @@
 import type { FTOptions } from '../core/types'
-import { Customers } from '../core/customers'
+import { Api } from '../core/api'
 import { FeatrackError } from '../core/featrack.errors'
 import { warnOrThrow } from '../core/helpers'
-import { Sessions } from '../core/sessions'
-import { Usages } from '../core/usages'
 
 export function FT(token: string, appSlug: string, {
   errorMode = 'warn',
@@ -25,45 +23,26 @@ export function FT(token: string, appSlug: string, {
   validateToken(token)
   validateAppSlug(appSlug)
 
-  const usages = new Usages()
-  const customers = new Customers()
-  const sessions = new Sessions()
+  const api = Api.getInstance()
 
-  usages.init(token, appSlug, {
+  api.init(token, appSlug, {
     ftApiUrl,
     errorMode,
   })
-
-  customers.init(token, appSlug, {
-    ftApiUrl,
-    errorMode,
-  })
-
-  sessions.init(token, appSlug, {
-    ftApiUrl,
-    errorMode,
-  })
-
-  async function identify(uniqueId: string) {
-    usages.identify(uniqueId)
-    await sessions.identify({ customerUniqueId: uniqueId })
-    const sessionId = sessions.getSessionId()
-    if (sessionId) {
-      usages.setSessionId(sessionId)
-    }
-  }
-
-  async function createCustomer(uniqueId: string, params?: { customerName?: string }) {
-    await customers.create(uniqueId, params)
-    usages.identify(uniqueId)
-  }
 
   return {
-    usages,
-    customers: {
-      create: createCustomer,
-      identify,
+    usages: {
+      track: api.usagesTrack.bind(api),
     },
-    sessions,
+    customers: {
+      create: api.customersCreate.bind(api),
+      identify: api.setCustomerId.bind(api),
+    },
+    sessions: {
+      start: api.sessionsStart.bind(api),
+      setTimeSpent: api.sessionsSetTimeSpent.bind(api),
+      end: api.sessionsEnd.bind(api),
+    },
+    api,
   }
 }
