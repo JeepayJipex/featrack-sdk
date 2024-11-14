@@ -244,6 +244,7 @@ export class Api<T extends FTOptions> {
     }
 
     try {
+      console.log('body', body)
       await this.axiosInstance.post(this.endpoints.usages.track, stripUndefinedValues(body))
     }
     catch (err: any) {
