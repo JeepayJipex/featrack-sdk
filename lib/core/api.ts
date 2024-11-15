@@ -73,6 +73,7 @@ export class Api<T extends FTOptions> {
 
     try {
       return this.axiosInstance.post(this.endpoints.customers.create, {
+        applicationSlug: this.applicationSlug,
         uniqueId,
         ...params,
       })

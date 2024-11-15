@@ -39,7 +39,7 @@ describe('api', () => {
     api.init('token', 'appSlug')
     const postSpy = vi.spyOn(api['axiosInstance']!, 'post').mockResolvedValue({ data: {} })
     await api.customersCreate('uniqueId', { customerName: 'Test Customer' })
-    expect(postSpy).toHaveBeenCalledWith('customers/create', { uniqueId: 'uniqueId', customerName: 'Test Customer' })
+    expect(postSpy).toHaveBeenCalledWith('customers/create', { uniqueId: 'uniqueId', customerName: 'Test Customer', applicationSlug: 'appSlug' })
   })
 
   it('should start a session', async () => {
